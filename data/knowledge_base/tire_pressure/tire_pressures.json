@@ -1,0 +1,14 @@
+{
+    "Toyota_Corolla_2018": {
+        "front": "33 psi",
+        "rear": "32 psi"
+    },
+    "Mazda_3_2016": {
+        "front": "36 psi",
+        "rear": "34 psi"
+    },
+    "Hyundai_i20_2019": {
+        "front": "32 psi",
+        "rear": "30 psi"
+    }
+}
