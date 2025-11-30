@@ -11,6 +11,8 @@
   <input type="file" id="files" multiple accept=".txt">
 
   <button onclick="upload()" class="btn">Upload</button>
+
+  <div id="uploadStatus" style="margin-top:10px; font-size:14px;"></div>
 </section>
 
 <section class="card">
@@ -52,16 +54,20 @@
   async function upload() {
     const folder = document.getElementById("folderSelect").value;
     const files = document.getElementById("files").files;
+    const statusEl = document.getElementById("uploadStatus");
 
     if (!folder) {
-      alert("Please select folder");
+      statusEl.innerHTML = `<span style="color:red">Please select folder</span>`;
       return;
     }
 
     if (files.length === 0) {
-      alert("Please choose files");
+      statusEl.innerHTML = `<span style="color:red">Please choose files</span>`;
       return;
     }
+
+    // Show "loading..."
+    statusEl.innerHTML = `<span style="color:blue">Uploading...</span>`;
 
     const fd = new FormData();
     fd.append("folder", folder);
@@ -76,12 +82,16 @@
         body: fd
       });
 
-      const txt = await res.text();
-      alert("Upload result: " + txt);
+      if (!res.ok) {
+        throw new Error("Upload failed");
+      }
+
+      statusEl.innerHTML = `<span style="color:green">Upload complete</span>`;
       loadFolders();
+
     } catch (err) {
+      statusEl.innerHTML = `<span style="color:red">Upload failed</span>`;
       console.error("Upload failed:", err);
-      alert("Upload error");
     }
   }
 
@@ -99,7 +109,7 @@
     document.getElementById("answer").innerText = data.answer;
   }
 
-  // init
+  // Init
   loadFolders();
 </script>
 

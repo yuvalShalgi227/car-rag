@@ -1,0 +1,28 @@
+Mazda 3 (2016) – Technical Specifications
+
+Engine:
+- Type: SKYACTIV-G 2.0L
+- Power: 155 hp
+- Torque: 200 Nm
+- Fuel system: Direct injection
+- Fuel type: Gasoline (95)
+
+Dimensions:
+- Length: 4580 mm
+- Width: 1795 mm
+- Height: 1450 mm
+- Wheelbase: 2700 mm
+
+Performance:
+- 0–100 km/h: 8.2 seconds
+- Transmission: 6-speed automatic
+- Drive type: FWD
+
+Fluids:
+- Engine oil: 0W-20 (4.3 L)
+- Coolant: Mazda FL22
+- Brake fluid: DOT 3 / DOT 4
+
+Tire pressure:
+- Front: 34 PSI
+- Rear: 32 PSI
