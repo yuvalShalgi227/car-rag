@@ -2,98 +2,116 @@
 {% block content %}
 
 <section class="card">
-  <h2>Upload Documents</h2>
+    <h2>Upload Documents</h2>
 
-  <label>Choose root folder</label>
-  <select id="rootSelect" onchange="updateSubfolders()">
-    <option value="KB/manuals">manuals</option>
-    <option value="KB/specs">specs</option>
-    <option value="KB/manufacturers">manufacturers</option>
-  </select>
+    <label>Choose root folder</label>
+    <select id="rootSelect" onchange="updateSubfolders()">
+        <option value="KB/manuals">manuals</option>
+        <option value="KB/specs">specs</option>
+        <option value="KB/manufacturers">manufacturers</option>
+    </select>
 
-  <label>Select existing folder</label>
-  <select id="subfolderSelect"></select>
+    <label>Select existing folder</label>
+    <select id="subfolderSelect"></select>
 
-  <label>Create subfolder inside selected folder (optional)</label>
-  <input id="newSub" class="input" placeholder="e.g. 2023">
+    <label>Create subfolder inside selected folder (optional)</label>
+    <input id="newSub" class="input" placeholder="e.g. 2023">
 
-  <label>Choose .txt files</label>
-  <input type="file" id="files" multiple accept=".txt">
+    <label>Choose .txt files</label>
+    <input type="file" id="files" multiple accept=".txt">
 
-  <button onclick="upload()" class="btn">Upload</button>
+    <button onclick="upload()" class="btn">Upload</button>
 
-  <div id="uploadStatus" style="margin-top:10px; font-size:14px;"></div>
+    <div id="uploadStatus" style="margin-top:10px; font-size:14px;"></div>
+    <button onclick="runIngestion()" class="btn" style="margin-top:10px;">Refresh KB</button>
+    <div id="ingestStatus" style="margin-top:10px; font-size:14px;"></div>
 </section>
 
 <script>
-  let allFolders = [];
+    let allFolders = [];
 
-  async function loadFolders() {
-    const res = await fetch("/folders");
-    const data = await res.json();
-    allFolders = data.folders;
-    updateSubfolders();
-  }
-
-  function updateSubfolders() {
-    const root = document.getElementById("rootSelect").value;
-    const sel = document.getElementById("subfolderSelect");
-    sel.innerHTML = "";
-
-    // show only folders under the chosen root
-    const filtered = allFolders.filter(f => f.startsWith(root));
-
-    // allow upload into root itself
-    const rootOption = document.createElement("option");
-    rootOption.value = root;
-    rootOption.textContent = root.replace("KB/", "");
-    sel.appendChild(rootOption);
-
-    // append deeper folders
-    filtered.forEach(f => {
-      if (f !== root) {
-        const opt = document.createElement("option");
-        opt.value = f;
-        opt.textContent = f.replace("KB/", "");
-        sel.appendChild(opt);
-      }
-    });
-  }
-
-  async function upload() {
-    const status = document.getElementById("uploadStatus");
-    const selected = document.getElementById("subfolderSelect").value;
-    const newSub = document.getElementById("newSub").value.trim();
-    const files = document.getElementById("files").files;
-
-    if (!files.length) {
-      status.innerHTML = `<span style="color:red">Choose files first</span>`;
-      return;
+    async function loadFolders() {
+        const res = await fetch("/folders");
+        const data = await res.json();
+        allFolders = data.folders;
+        updateSubfolders();
     }
 
-    // final path:
-    // either existing folder, or existing + new subfolder
-    let finalFolder = selected;
-    if (newSub) finalFolder = `${selected}/${newSub}`;
+    function updateSubfolders() {
+        const root = document.getElementById("rootSelect").value;
+        const sel = document.getElementById("subfolderSelect");
+        sel.innerHTML = "";
 
-    status.innerHTML = `<span style="color:blue">Uploading...</span>`;
+        // show only folders under the chosen root
+        const filtered = allFolders.filter(f => f.startsWith(root));
 
-    const fd = new FormData();
-    fd.append("folder", finalFolder);
-    for (const f of files) fd.append("files", f);
+        // allow upload into root itself
+        const rootOption = document.createElement("option");
+        rootOption.value = root;
+        rootOption.textContent = root.replace("KB/", "");
+        sel.appendChild(rootOption);
 
-    try {
-      const res = await fetch("/upload", { method: "POST", body: fd });
-      if (!res.ok) throw new Error();
-
-      status.innerHTML = `<span style="color:green">Upload complete</span>`;
-      loadFolders();
-    } catch {
-      status.innerHTML = `<span style="color:red">Upload failed</span>`;
+        // append deeper folders
+        filtered.forEach(f => {
+            if (f !== root) {
+                const opt = document.createElement("option");
+                opt.value = f;
+                opt.textContent = f.replace("KB/", "");
+                sel.appendChild(opt);
+            }
+        });
     }
-  }
 
-  loadFolders();
+    async function upload() {
+        const status = document.getElementById("uploadStatus");
+        const selected = document.getElementById("subfolderSelect").value;
+        const newSub = document.getElementById("newSub").value.trim();
+        const files = document.getElementById("files").files;
+
+        if (!files.length) {
+            status.innerHTML = `<span style="color:red">Choose files first</span>`;
+            return;
+        }
+
+        // final path:
+        // either existing folder, or existing + new subfolder
+        let finalFolder = selected;
+        if (newSub) finalFolder = `${selected}/${newSub}`;
+
+        status.innerHTML = `<span style="color:blue">Uploading...</span>`;
+
+        const fd = new FormData();
+        fd.append("folder", finalFolder);
+        for (const f of files) fd.append("files", f);
+
+        try {
+            const res = await fetch("/upload", {method: "POST", body: fd});
+            if (!res.ok) throw new Error();
+
+            status.innerHTML = `<span style="color:green">Uploaded ${[...files].map(f => f.name).join(", ")} → ${finalFolder} </span>`;
+            loadFolders();
+        } catch {
+            status.innerHTML = `<span style="color:red">Upload failed</span>`;
+        }
+    }
+
+    async function runIngestion() {
+        const status = document.getElementById("ingestStatus");
+        status.innerHTML = `<span style="color:blue">Running ingestion...</span>`;
+
+        try {
+            const res = await fetch("/ingest", { method: "POST" });
+            if (!res.ok) throw new Error();
+
+            const txt = await res.text();
+            status.innerHTML = `<span style="color:green">${txt}</span>`;
+
+        } catch (err) {
+            status.innerHTML = `<span style="color:red">Ingestion failed</span>`;
+        }
+    }
+
+    loadFolders();
 </script>
 
 {% endblock %}

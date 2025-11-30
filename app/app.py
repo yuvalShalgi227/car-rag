@@ -29,6 +29,16 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
+
+
+@app.post("/ingest")
+def ingest():
+    job = agent_client.start_ingestion_job(
+        knowledgeBaseId=KB_ID,
+        dataSourceId=DS_ID
+    )
+    return "KB ingestion started"
+
 # ---------------------------
 # API: upload file to selected folder
 # ---------------------------
