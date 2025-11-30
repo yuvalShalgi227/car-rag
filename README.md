@@ -1,4 +1,4 @@
-# RAG Car Diagnostic Dashboard
+# RAG Car Diagnostic
 
 An AI-powered automotive assistant that helps you manage your car and resolve issues using Retrieval-Augmented Generation (RAG) technology powered by AWS Bedrock.
 
