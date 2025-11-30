@@ -4,8 +4,18 @@
 <section class="card">
   <h2>Upload Documents</h2>
 
-  <label>Select S3 Folder</label>
-  <select id="folderSelect"></select>
+  <label>Choose root folder</label>
+  <select id="rootSelect" onchange="updateSubfolders()">
+    <option value="KB/manuals">manuals</option>
+    <option value="KB/specs">specs</option>
+    <option value="KB/manufacturers">manufacturers</option>
+  </select>
+
+  <label>Select existing folder</label>
+  <select id="subfolderSelect"></select>
+
+  <label>Create subfolder inside selected folder (optional)</label>
+  <input id="newSub" class="input" placeholder="e.g. 2023">
 
   <label>Choose .txt files</label>
   <input type="file" id="files" multiple accept=".txt">
@@ -15,101 +25,74 @@
   <div id="uploadStatus" style="margin-top:10px; font-size:14px;"></div>
 </section>
 
-<section class="card">
-  <h2>Ask the Knowledge Base</h2>
-  <input id="q" placeholder="Enter your question" class="input">
-  <button onclick="ask()" class="btn">Ask</button>
-
-  <pre id="answer" class="answer"></pre>
-</section>
-
 <script>
-  // Load folders
+  let allFolders = [];
+
   async function loadFolders() {
-    try {
-      const res = await fetch("/folders");
-      const data = await res.json();
-
-      const sel = document.getElementById("folderSelect");
-      sel.innerHTML = "";
-
-      const indented = data.folders.map(path => {
-        const depth = path.split("/").length - 1;
-        const prefix = "- ".repeat(depth);
-        return { value: path, label: prefix + path };
-      });
-
-      indented.forEach(item => {
-        const opt = document.createElement("option");
-        opt.value = item.value;
-        opt.textContent = item.label;
-        sel.appendChild(opt);
-      });
-    } catch (err) {
-      console.error("Error loading folders:", err);
-    }
+    const res = await fetch("/folders");
+    const data = await res.json();
+    allFolders = data.folders;
+    updateSubfolders();
   }
 
-  // Upload files
+  function updateSubfolders() {
+    const root = document.getElementById("rootSelect").value;
+    const sel = document.getElementById("subfolderSelect");
+    sel.innerHTML = "";
+
+    // show only folders under the chosen root
+    const filtered = allFolders.filter(f => f.startsWith(root));
+
+    // allow upload into root itself
+    const rootOption = document.createElement("option");
+    rootOption.value = root;
+    rootOption.textContent = root.replace("KB/", "");
+    sel.appendChild(rootOption);
+
+    // append deeper folders
+    filtered.forEach(f => {
+      if (f !== root) {
+        const opt = document.createElement("option");
+        opt.value = f;
+        opt.textContent = f.replace("KB/", "");
+        sel.appendChild(opt);
+      }
+    });
+  }
+
   async function upload() {
-    const folder = document.getElementById("folderSelect").value;
+    const status = document.getElementById("uploadStatus");
+    const selected = document.getElementById("subfolderSelect").value;
+    const newSub = document.getElementById("newSub").value.trim();
     const files = document.getElementById("files").files;
-    const statusEl = document.getElementById("uploadStatus");
 
-    if (!folder) {
-      statusEl.innerHTML = `<span style="color:red">Please select folder</span>`;
+    if (!files.length) {
+      status.innerHTML = `<span style="color:red">Choose files first</span>`;
       return;
     }
 
-    if (files.length === 0) {
-      statusEl.innerHTML = `<span style="color:red">Please choose files</span>`;
-      return;
-    }
+    // final path:
+    // either existing folder, or existing + new subfolder
+    let finalFolder = selected;
+    if (newSub) finalFolder = `${selected}/${newSub}`;
 
-    // Show "loading..."
-    statusEl.innerHTML = `<span style="color:blue">Uploading...</span>`;
+    status.innerHTML = `<span style="color:blue">Uploading...</span>`;
 
     const fd = new FormData();
-    fd.append("folder", folder);
-
-    for (const f of files) {
-      fd.append("files", f);
-    }
+    fd.append("folder", finalFolder);
+    for (const f of files) fd.append("files", f);
 
     try {
-      const res = await fetch("/upload", {
-        method: "POST",
-        body: fd
-      });
+      const res = await fetch("/upload", { method: "POST", body: fd });
+      if (!res.ok) throw new Error();
 
-      if (!res.ok) {
-        throw new Error("Upload failed");
-      }
-
-      statusEl.innerHTML = `<span style="color:green">Upload complete</span>`;
+      status.innerHTML = `<span style="color:green">Upload complete</span>`;
       loadFolders();
-
-    } catch (err) {
-      statusEl.innerHTML = `<span style="color:red">Upload failed</span>`;
-      console.error("Upload failed:", err);
+    } catch {
+      status.innerHTML = `<span style="color:red">Upload failed</span>`;
     }
   }
 
-  // Ask KB
-  async function ask() {
-    const q = document.getElementById("q").value;
-
-    const res = await fetch("/ask", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question: q })
-    });
-
-    const data = await res.json();
-    document.getElementById("answer").innerText = data.answer;
-  }
-
-  // Init
   loadFolders();
 </script>
 
