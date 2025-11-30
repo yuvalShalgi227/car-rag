@@ -118,13 +118,27 @@ def ask():
     data = request.get_json()
     question = (data.get("question") or "").strip()
 
+    # Custom system prompt for brief, direct answers
+    system_prompt = """Always answer briefly and directly. Do not mention sources, the knowledge base, or how you derived the answer. Just state the fact."""
+
     resp = agent_runtime.retrieve_and_generate(
         input={"text": question},
         retrieveAndGenerateConfiguration={
             "type": "KNOWLEDGE_BASE",
             "knowledgeBaseConfiguration": {
                 "knowledgeBaseId": KB_ID,
-                "modelArn": f"arn:aws:bedrock:{REGION}::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0"
+                "modelArn": f"arn:aws:bedrock:{REGION}::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0",
+                "generationConfiguration": {
+                    "promptTemplate": {
+                        "textPromptTemplate": f"""{system_prompt}
+
+$search_results$
+
+User question: $query$
+
+Answer:"""
+                    }
+                }
             }
         }
     )
