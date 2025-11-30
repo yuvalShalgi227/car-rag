@@ -22,43 +22,85 @@
 </section>
 
 <script>
+  // Load folders
   async function loadFolders() {
-    const res = await fetch("/folders");
-    const data = await res.json();
-    const sel = document.getElementById("folderSelect");
-    sel.innerHTML = "";
-    data.folders.forEach(f => {
-      const o = document.createElement("option");
-      o.value = f;
-      o.textContent = f;
-      sel.appendChild(o);
-    });
-  }
-  loadFolders();
+    try {
+      const res = await fetch("/folders");
+      const data = await res.json();
 
+      const sel = document.getElementById("folderSelect");
+      sel.innerHTML = "";
+
+      const indented = data.folders.map(path => {
+        const depth = path.split("/").length - 1;
+        const prefix = "- ".repeat(depth);
+        return { value: path, label: prefix + path };
+      });
+
+      indented.forEach(item => {
+        const opt = document.createElement("option");
+        opt.value = item.value;
+        opt.textContent = item.label;
+        sel.appendChild(opt);
+      });
+    } catch (err) {
+      console.error("Error loading folders:", err);
+    }
+  }
+
+  // Upload files
   async function upload() {
-    const fd = new FormData();
-    fd.append("folder", document.getElementById("folderSelect").value);
-
+    const folder = document.getElementById("folderSelect").value;
     const files = document.getElementById("files").files;
-    for (const f of files) fd.append("files", f);
 
-    const res = await fetch("/upload", { method: "POST", body: fd });
-    const t = await res.text();
-    alert(t);
+    if (!folder) {
+      alert("Please select folder");
+      return;
+    }
+
+    if (files.length === 0) {
+      alert("Please choose files");
+      return;
+    }
+
+    const fd = new FormData();
+    fd.append("folder", folder);
+
+    for (const f of files) {
+      fd.append("files", f);
+    }
+
+    try {
+      const res = await fetch("/upload", {
+        method: "POST",
+        body: fd
+      });
+
+      const txt = await res.text();
+      alert("Upload result: " + txt);
+      loadFolders();
+    } catch (err) {
+      console.error("Upload failed:", err);
+      alert("Upload error");
+    }
   }
 
+  // Ask KB
   async function ask() {
     const q = document.getElementById("q").value;
+
     const res = await fetch("/ask", {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question: q })
     });
 
     const data = await res.json();
     document.getElementById("answer").innerText = data.answer;
   }
+
+  // init
+  loadFolders();
 </script>
 
 {% endblock %}

@@ -30,20 +30,12 @@ def index():
     return render_template("index.html")
 
 # ---------------------------
-# API: list folders from S3 prefix
-# ---------------------------
-@app.get("/folders")
-def list_folders():
-    resp = s3.list_objects_v2(Bucket=S3_BUCKET, Delimiter="/")
-    prefixes = [p["Prefix"] for p in resp.get("CommonPrefixes", [])]
-    return jsonify({"folders": prefixes})
-
-# ---------------------------
 # API: upload file to selected folder
 # ---------------------------
 @app.post("/upload")
 def upload():
     folder = request.form.get("folder", "").strip()
+    print(f"start upload to folder: {folder}")
     if folder and not folder.endswith("/"):
         folder += "/"
 
@@ -52,6 +44,7 @@ def upload():
 
     uploaded = []
     for f in request.files.getlist("files"):
+        print(f"uploading {f.filename}")
         if f.filename.lower().endswith(".txt"):
             key = f"{folder}{f.filename}"
             s3.upload_fileobj(f, S3_BUCKET, key, ExtraArgs={"ContentType": "text/plain"})
@@ -63,6 +56,27 @@ def upload():
     )
 
     return jsonify({"uploaded": uploaded})
+
+@app.get("/folders")
+def get_folders():
+    prefixes = set()
+    all_keys = []
+
+    paginator = s3.get_paginator("list_objects_v2")
+    for page in paginator.paginate(Bucket=S3_BUCKET):
+        for obj in page.get("Contents", []):
+            key = obj["Key"]
+            all_keys.append(key)
+
+    # Build folder structure
+    for key in all_keys:
+        parts = key.split("/")[:-1]  # remove filename
+        for i in range(1, len(parts) + 1):
+            prefix = "/".join(parts[:i])
+            prefixes.add(prefix)
+
+    folders = sorted(prefixes)
+    return jsonify({"folders": folders})
 
 # ---------------------------
 # API: ask KB
