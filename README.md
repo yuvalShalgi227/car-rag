@@ -2,6 +2,8 @@
 
 An AI-powered automotive assistant that helps you manage your car and resolve issues using Retrieval-Augmented Generation (RAG) technology powered by AWS Bedrock.
 
+<img width="1865" height="868" alt="image" src="https://github.com/user-attachments/assets/3ff2dee1-f13a-4400-8fde-bf779d372124" />
+
 ## What is This Project?
 
 This is an **intelligent automotive knowledge base** that uses AI to answer your car-related questions. Think of it as having an expert mechanic available 24/7 to help you with:
