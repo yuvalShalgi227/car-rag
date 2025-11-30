@@ -1,0 +1,53 @@
+Mazda 3 (2025) – Technical Specifications
+
+Engine:
+- Type: SKYACTIV-G 2.0L (Updated 2025 revision)
+- Power: 163 hp
+- Torque: 210 Nm
+- Fuel system: Direct injection
+- Fuel type: Gasoline 95 / E10 compatible
+- Emissions standard: Euro 6e
+
+Dimensions:
+- Length: 4585 mm
+- Width: 1795 mm
+- Height: 1455 mm
+- Wheelbase: 2720 mm
+- Curb weight: 1330 kg
+
+Performance:
+- 0–100 km/h: 8.1 seconds
+- Transmission: 6-speed automatic (revised shift logic)
+- Drive type: FWD
+- Fuel consumption: 5.9 L/100km combined
+
+Safety Systems:
+- ABS / EBD / BA
+- ESC with G-Vectoring Control Plus
+- Adaptive Cruise Control (2025 enhanced)
+- Lane Keep Assist & Lane Departure Warning
+- Blind Spot Monitoring
+- AEB with pedestrian detection
+- 8 airbags standard
+
+Tire & Wheel:
+- Standard tire size: 215/45 R18
+- Tire pressure: 34 PSI front / 32 PSI rear
+- Spare tire: Space-saver type
+
+Fluids:
+- Engine oil: 0W-20 (4.4 L with filter)
+- Coolant: Mazda FL22 (Long Life)
+- Brake fluid: DOT 4
+- Transmission fluid: Mazda ATF FZ
+
+Maintenance Intervals:
+- Oil change: every 10,000 km or 12 months
+- Air filter: every 25,000 km
+- Cabin filter: every 15,000 km
+- Spark plugs: every 60,000 km
+- Brake fluid: every 2 years
+
+Notes:
+- The 2025 model includes mild-hybrid assist on some trims (not all markets).
+- Compatible with Mazda Connected Services and OTA updates.

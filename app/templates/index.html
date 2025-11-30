@@ -2,17 +2,22 @@
 {% block content %}
 
 <section class="card">
+    <h2>Ask Question</h2>
+
+    <label>Enter your question</label>
+    <input id="questionInput" class="input" placeholder="e.g. What is the maximum speed?">
+
+    <button onclick="askQuestion()" class="btn" style="width: 100%; margin-top: 10px;">Ask</button>
+
+    <div id="answerStatus"></div>
+    <div id="answerText" style="margin-top: 12px; padding: 12px; background: rgba(0,100,200,0.1); border-radius: 6px; display: none; line-height: 1.6;"></div>
+</section>
+
+<section class="card">
     <h2>Upload Documents</h2>
 
-    <label>Choose root folder</label>
-    <select id="rootSelect" onchange="updateSubfolders()">
-        <option value="KB/manuals">manuals</option>
-        <option value="KB/specs">specs</option>
-        <option value="KB/manufacturers">manufacturers</option>
-    </select>
-
     <label>Select existing folder</label>
-    <select id="subfolderSelect"></select>
+    <select id="folderSelect"></select>
 
     <label>Create subfolder inside selected folder (optional)</label>
     <input id="newSub" class="input" placeholder="e.g. 2023">
@@ -20,11 +25,13 @@
     <label>Choose .txt files</label>
     <input type="file" id="files" multiple accept=".txt">
 
-    <button onclick="upload()" class="btn">Upload</button>
+    <div class="button-group">
+        <button onclick="upload()" class="btn">Upload</button>
+        <button onclick="runIngestion()" class="btn">Refresh KB</button>
+    </div>
 
-    <div id="uploadStatus" style="margin-top:10px; font-size:14px;"></div>
-    <button onclick="runIngestion()" class="btn" style="margin-top:10px;">Refresh KB</button>
-    <div id="ingestStatus" style="margin-top:10px; font-size:14px;"></div>
+    <div id="uploadStatus"></div>
+    <div id="ingestStatus"></div>
 </section>
 
 <script>
@@ -34,37 +41,58 @@
         const res = await fetch("/folders");
         const data = await res.json();
         allFolders = data.folders;
-        updateSubfolders();
+        populateFolders();
     }
 
-    function updateSubfolders() {
-        const root = document.getElementById("rootSelect").value;
-        const sel = document.getElementById("subfolderSelect");
+    function populateFolders() {
+        const sel = document.getElementById("folderSelect");
         sel.innerHTML = "";
 
-        // show only folders under the chosen root
-        const filtered = allFolders.filter(f => f.startsWith(root));
-
-        // allow upload into root itself
-        const rootOption = document.createElement("option");
-        rootOption.value = root;
-        rootOption.textContent = root.replace("KB/", "");
-        sel.appendChild(rootOption);
-
-        // append deeper folders
-        filtered.forEach(f => {
-            if (f !== root) {
-                const opt = document.createElement("option");
-                opt.value = f;
-                opt.textContent = f.replace("KB/", "");
-                sel.appendChild(opt);
-            }
+        allFolders.forEach(f => {
+            const opt = document.createElement("option");
+            opt.value = f;
+            opt.textContent = f;
+            sel.appendChild(opt);
         });
+    }
+
+    async function askQuestion() {
+        const question = document.getElementById("questionInput").value.trim();
+        const statusEl = document.getElementById("answerStatus");
+        const answerEl = document.getElementById("answerText");
+
+        if (!question) {
+            statusEl.innerHTML = `<span style="color:red">Please enter a question</span>`;
+            answerEl.style.display = "none";
+            return;
+        }
+
+        statusEl.innerHTML = `<span style="color:blue">Searching knowledge base...</span>`;
+        answerEl.style.display = "none";
+
+        try {
+            const res = await fetch("/ask", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({question})
+            });
+
+            if (!res.ok) throw new Error();
+
+            const data = await res.json();
+            statusEl.innerHTML = `<span style="color:green">Answer:</span>`;
+            answerEl.innerHTML = data.answer;
+            answerEl.style.display = "block";
+
+        } catch (err) {
+            statusEl.innerHTML = `<span style="color:red">Failed to get answer</span>`;
+            console.error(err);
+        }
     }
 
     async function upload() {
         const status = document.getElementById("uploadStatus");
-        const selected = document.getElementById("subfolderSelect").value;
+        const selected = document.getElementById("folderSelect").value;
         const newSub = document.getElementById("newSub").value.trim();
         const files = document.getElementById("files").files;
 
@@ -73,8 +101,8 @@
             return;
         }
 
-        // final path:
-        // either existing folder, or existing + new subfolder
+        // Scenario 1: Upload to existing folder (no subfolder)
+        // Scenario 2: Upload to new subfolder under existing folder
         let finalFolder = selected;
         if (newSub) finalFolder = `${selected}/${newSub}`;
 
@@ -88,7 +116,7 @@
             const res = await fetch("/upload", {method: "POST", body: fd});
             if (!res.ok) throw new Error();
 
-            status.innerHTML = `<span style="color:green">Uploaded ${[...files].map(f => f.name).join(", ")} → ${finalFolder} </span>`;
+            status.innerHTML = `<span style="color:green">Uploaded ${[...files].map(f => f.name).join(", ")} → ${finalFolder}</span>`;
             loadFolders();
         } catch {
             status.innerHTML = `<span style="color:red">Upload failed</span>`;
@@ -100,31 +128,20 @@
         statusEl.innerHTML = `<span style="color:blue">Starting ingestion...</span>`;
 
         try {
-            // Start ingestion
             const res = await fetch("/ingest", {method: "POST"});
             const data = await res.json();
             const jobId = data.jobId;
 
-            statusEl.innerHTML = `<span style="color:blue">
-      Ingestion started (job ${jobId}). Checking status...
-    </span>`;
+            statusEl.innerHTML = `<span style="color:blue">Ingestion started (job ${jobId}). Checking status...</span>`;
 
-            console.log("Polling start, job:", jobId);
-
-            // Define polling function INSIDE runIngestion
             async function poll() {
-                console.log("Polling...");
-
                 const sres = await fetch(`/ingest_status?jobId=${jobId}`);
                 const sdata = await sres.json();
-
-                console.log("Status:", sdata.status);
-
                 const st = sdata.status;
 
                 if (st === "STARTING" || st === "STARTED" || st === "IN_PROGRESS") {
                     statusEl.innerHTML = `<span style="color:blue">In progress...</span>`;
-                    setTimeout(poll, 2000); // SCHEDULE NEXT POLL
+                    setTimeout(poll, 2000);
                     return;
                 }
 
@@ -133,11 +150,9 @@
                     return;
                 }
 
-                // error case
                 statusEl.innerHTML = `<span style="color:red">Ingestion failed: ${st}</span>`;
             }
 
-            // Start polling
             await poll();
 
         } catch (err) {
@@ -146,10 +161,7 @@
         }
     }
 
-
     loadFolders();
-
-
 </script>
 
 {% endblock %}
