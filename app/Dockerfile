@@ -13,15 +13,16 @@ RUN apt-get update && apt-get install -y \
     git curl build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy project
-COPY . .
+# Copy requirements and install dependencies
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Pre-download nltk data
 RUN python -m nltk.downloader punkt stopwords
 
-
-
+# Copy backend and frontend
+COPY backend/ ./backend/
+COPY frontend/ ./frontend/
 
 EXPOSE 8000
-CMD ["python", "app.py"]
+CMD ["python", "backend/app.py"]

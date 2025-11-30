@@ -1,14 +1,26 @@
 import os
 from flask import Flask, request, jsonify, render_template
 import boto3
+from dotenv import load_dotenv
+
+# ---------------------------
+# Load environment variables from .env file
+# ---------------------------
+# Look for .env file in parent directory (app root)
+env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+load_dotenv(env_path)
 
 # ---------------------------
 # Env config
 # ---------------------------
 REGION = os.environ.get("REGION", "us-east-1")
-KB_ID = os.environ.get("KB_ID", "TVUWZMEJQ2")
-DS_ID = os.environ.get("DS_ID", "MD435CFF3F")
-S3_BUCKET = os.environ.get("S3_BUCKET", "aicourse-lesson7-clay227")
+KB_ID = os.environ.get("KB_ID")
+DS_ID = os.environ.get("DS_ID")
+S3_BUCKET = os.environ.get("S3_BUCKET")
+
+# Validate required environment variables
+if not all([KB_ID, DS_ID, S3_BUCKET]):
+    raise ValueError("Missing required environment variables. Please check your .env file.")
 
 # ---------------------------
 # AWS clients
@@ -20,7 +32,27 @@ agent_client = boto3.client("bedrock-agent", region_name=REGION)
 # ---------------------------
 # Flask
 # ---------------------------
-app = Flask(__name__)
+# Point to frontend folder for templates and static files
+frontend_dir = os.path.join(os.path.dirname(__file__), '..', 'frontend')
+template_dir = os.path.join(frontend_dir, 'templates')
+static_dir = os.path.join(frontend_dir, 'static')
+
+app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
+
+# ---------------------------
+# Load system prompt from file
+# ---------------------------
+def load_system_prompt():
+    """Load system prompt from system-prompt.txt file"""
+    prompt_file = os.path.join(os.path.dirname(__file__), 'system-prompt.txt')
+    try:
+        with open(prompt_file, 'r', encoding='utf-8') as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        # Fallback to default if file not found
+        return "Always answer briefly and directly. Do not mention sources, the knowledge base, or how you derived the answer. Just state the fact."
+
+SYSTEM_PROMPT = load_system_prompt()
 
 # ---------------------------
 # Page
@@ -118,9 +150,7 @@ def ask():
     data = request.get_json()
     question = (data.get("question") or "").strip()
 
-    # Custom system prompt for brief, direct answers
-    system_prompt = """Always answer briefly and directly. Do not mention sources, the knowledge base, or how you derived the answer. Just state the fact."""
-
+    # Use system prompt loaded from file
     resp = agent_runtime.retrieve_and_generate(
         input={"text": question},
         retrieveAndGenerateConfiguration={
@@ -130,7 +160,7 @@ def ask():
                 "modelArn": f"arn:aws:bedrock:{REGION}::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0",
                 "generationConfiguration": {
                     "promptTemplate": {
-                        "textPromptTemplate": f"""{system_prompt}
+                        "textPromptTemplate": f"""{SYSTEM_PROMPT}
 
 $search_results$
 
