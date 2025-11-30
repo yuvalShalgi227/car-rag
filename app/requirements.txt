@@ -1,5 +1,6 @@
 boto3
 flask
+python-dotenv
 faiss-cpu
 numpy
 nltk

@@ -1,0 +1,145 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #0a0a0a;
+  color: #e6e6e6;
+}
+
+/* HEADER */
+.main-header {
+  background: linear-gradient(180deg, #003b73, #00284d);
+  color: #fff;
+  text-align: center;
+  padding: 25px 0;
+  font-size: 32px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  border-bottom: 4px solid #0055aa;
+  text-shadow: 0 0 6px #1e90ff;
+  z-index: 20;
+  position: relative;
+}
+
+/* Center content */
+.container {
+  max-width: 650px;
+  margin: 15px auto;
+  padding: 15px;
+  position: relative;
+  z-index: 10;
+}
+
+/* Panels */
+.card {
+  background: rgba(20,20,20,0.9);
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  border: 1px solid #1f1f1f;
+  box-shadow: 0 0 20px rgba(0,0,0,0.7),
+  inset 0 0 10px rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+}
+
+.card h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #ff9800;
+  text-shadow: 0 0 6px #ff6a00;
+  font-size: 24px;
+}
+
+.card label {
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 4px;
+  font-size: 14px;
+  color: #aaa;
+}
+
+/* Inputs */
+.input, select, input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  border: 1px solid #333;
+  background: #000;
+  color: #76c7ff;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+/* Button container for inline buttons */
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.btn {
+  background: #0066cc;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  flex: 1;
+}
+
+.btn:hover {
+  background: #0088ff;
+  box-shadow: 0 0 15px #0077ff;
+}
+
+/* Status messages */
+#uploadStatus, #ingestStatus {
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+/* Gauges – bigger and better aligned */
+.gauge-left,
+.gauge-right,
+.gauge-left-bottom,
+.gauge-right-bottom {
+  position: fixed;
+  width: 380px;
+  height: 380px;
+  opacity: 0.25;
+  z-index: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 0 20px #0088ff);
+}
+
+/* Top gauges */
+.gauge-left {
+  top: 100px;
+  left: 10px;
+}
+
+.gauge-right {
+  top: 100px;
+  right: 10px;
+}
+
+/* Bottom gauges */
+.gauge-left-bottom {
+  top: 500px;
+  left: 10px;
+}
+
+.gauge-right-bottom {
+  top: 500px;
+  right: 10px;
+}
+
+.gauge-left svg,
+.gauge-right svg,
+.gauge-left-bottom svg,
+.gauge-right-bottom svg {
+  width: 100%;
+  height: 100%;
+}
