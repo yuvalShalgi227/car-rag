@@ -15,44 +15,101 @@
 
 <!-- LEFT GAUGE -->
 <div class="gauge-left">
-    <svg viewBox="0 0 200 200">
-        <circle cx="100" cy="100" r="90" stroke="#ff9800" stroke-width="4" fill="none"/>
+    <svg viewBox="-30 -20 260 200" preserveAspectRatio="xMidYMid meet">
+        <!-- Gauge arc (240° from bottom-left to bottom-right) -->
+        <path d="M 23,142 A 90,90 0 1,1 177,142"
+              stroke="#ff9800" stroke-width="5" fill="none" stroke-linecap="round"/>
 
-        <g stroke="#666" stroke-width="3">
-            <line x1="100" y1="15" x2="100" y2="30"/>
-            <line x1="160" y1="40" x2="150" y2="55"/>
-            <line x1="185" y1="100" x2="170" y2="100"/>
-            <line x1="160" y1="160" x2="150" y2="145"/>
-            <line x1="100" y1="185" x2="100" y2="170"/>
-            <line x1="40" y1="160" x2="55" y2="145"/>
-            <line x1="15" y1="100" x2="30" y2="100"/>
-            <line x1="40" y1="40" x2="55" y2="55"/>
+        <!-- Major tick marks (every 30° along the 240° arc) -->
+        <g stroke="#888" stroke-width="3" stroke-linecap="round">
+            <line x1="100" y1="15" x2="100" y2="32" transform="rotate(-120 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="32" transform="rotate(-90 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="32" transform="rotate(-60 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="32" transform="rotate(-30 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="32" transform="rotate(0 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="32" transform="rotate(30 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="32" transform="rotate(60 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="32" transform="rotate(90 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="32" transform="rotate(120 100 100)"/>
         </g>
 
-        <!-- Static needle -->
-        <line id="needleLeft" x1="100" y1="100" x2="150" y2="100"
-              stroke="#00eaff" stroke-width="4"/>
+        <!-- Minor tick marks (every 10°) -->
+        <g stroke="#555" stroke-width="1.5" stroke-linecap="round">
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(-110 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(-100 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(-80 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(-70 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(-50 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(-40 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(-20 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(-10 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(10 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(20 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(40 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(50 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(70 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(80 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(100 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(110 100 100)"/>
+        </g>
+
+        <!-- Center hub -->
+        <circle cx="100" cy="100" r="8" fill="#333"/>
+
+        <!-- Animated needle -->
+        <line id="needleLeft" x1="100" y1="100" x2="100" y2="30"
+              stroke="#00eaff" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="100" cy="100" r="5" fill="#00eaff"/>
     </svg>
 </div>
 
 <!-- RIGHT GAUGE -->
 <div class="gauge-right">
-    <svg viewBox="0 0 200 200">
-        <circle cx="100" cy="100" r="90" stroke="#ff9800" stroke-width="4" fill="none"/>
+    <svg viewBox="-30 -20 260 200" preserveAspectRatio="xMidYMid meet">
+        <!-- Gauge arc (240° from bottom-left to bottom-right) -->
+        <path d="M 23,142 A 90,90 0 1,1 177,142"
+              stroke="#ff9800" stroke-width="5" fill="none" stroke-linecap="round"/>
 
-        <g stroke="#666" stroke-width="3">
-            <line x1="100" y1="15" x2="100" y2="30"/>
-            <line x1="160" y1="40" x2="150" y2="55"/>
-            <line x1="185" y1="100" x2="170" y2="100"/>
-            <line x1="160" y1="160" x2="150" y2="145"/>
-            <line x1="100" y1="185" x2="100" y2="170"/>
-            <line x1="40" y1="160" x2="55" y2="145"/>
-            <line x1="15" y1="100" x2="30" y2="100"/>
-            <line x1="40" y1="40" x2="55" y2="55"/>
+        <!-- Major tick marks (every 30° along the 240° arc) -->
+        <g stroke="#888" stroke-width="3" stroke-linecap="round">
+            <line x1="100" y1="15" x2="100" y2="32" transform="rotate(-120 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="32" transform="rotate(-90 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="32" transform="rotate(-60 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="32" transform="rotate(-30 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="32" transform="rotate(0 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="32" transform="rotate(30 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="32" transform="rotate(60 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="32" transform="rotate(90 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="32" transform="rotate(120 100 100)"/>
         </g>
 
-        <line id="needleRight" x1="100" y1="100" x2="50" y2="100"
-              stroke="#00eaff" stroke-width="4"/>
+        <!-- Minor tick marks (every 10°) -->
+        <g stroke="#555" stroke-width="1.5" stroke-linecap="round">
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(-110 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(-100 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(-80 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(-70 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(-50 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(-40 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(-20 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(-10 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(10 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(20 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(40 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(50 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(70 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(80 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(100 100 100)"/>
+            <line x1="100" y1="15" x2="100" y2="27" transform="rotate(110 100 100)"/>
+        </g>
+
+        <!-- Center hub -->
+        <circle cx="100" cy="100" r="8" fill="#333"/>
+
+        <!-- Animated needle -->
+        <line id="needleRight" x1="100" y1="100" x2="100" y2="30"
+              stroke="#00eaff" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="100" cy="100" r="5" fill="#00eaff"/>
     </svg>
 </div>
 
@@ -61,11 +118,16 @@
 </div>
 
 <script>
-    /* --- Light animation: slow needle oscillation --- */
-    /* לא כבד – רק תנועה נעימה */
-    let angle = 0;
-    setInterval(() => {
-        angle = (angle + 1.2) % 30;  /* oscillation 0–30 degrees */
+    /* --- Car gauge needle animation: sweeping within the 240° arc --- */
+    let time = 0;
+    const sweepRange = 120;  // ±120° = 240° total arc (car gauge style)
+    const speed = 0.0012;    // Animation speed (lower = slower)
+
+    function animateNeedles() {
+        time += speed;
+
+        // Use sine wave for smooth back-and-forth motion within gauge range
+        const angle = Math.sin(time) * sweepRange;
 
         const left = document.getElementById("needleLeft");
         const right = document.getElementById("needleRight");
@@ -73,7 +135,11 @@
         if (left) left.setAttribute("transform", `rotate(${angle} 100 100)`);
         if (right) right.setAttribute("transform", `rotate(${-angle} 100 100)`);
 
-    }, 120);
+        requestAnimationFrame(animateNeedles);
+    }
+
+    // Start animation when page loads
+    animateNeedles();
 </script>
 
 </body>
