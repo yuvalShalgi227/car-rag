@@ -37,7 +37,29 @@ def ingest():
         knowledgeBaseId=KB_ID,
         dataSourceId=DS_ID
     )
-    return "KB ingestion started"
+    return jsonify({"jobId": job["ingestionJob"]["ingestionJobId"]})
+
+@app.get("/ingest_status")
+def ingest_status():
+    job_id = request.args.get("jobId")
+    if not job_id:
+        return jsonify({"error": "missing jobId"}), 400
+
+    try:
+        res = agent_client.get_ingestion_job(
+            knowledgeBaseId=KB_ID,
+            dataSourceId=DS_ID,
+            ingestionJobId=job_id
+        )
+
+        print("INGESTION STATUS RAW:", res)
+
+        status = res["ingestionJob"]["status"]
+        return jsonify({"status": status})
+
+    except Exception as e:
+        print("ERROR IN STATUS CHECK:", str(e))
+        return jsonify({"status": "ERROR", "detail": str(e)})
 
 # ---------------------------
 # API: upload file to selected folder

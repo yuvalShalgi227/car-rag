@@ -96,22 +96,60 @@
     }
 
     async function runIngestion() {
-        const status = document.getElementById("ingestStatus");
-        status.innerHTML = `<span style="color:blue">Running ingestion...</span>`;
+        const statusEl = document.getElementById("ingestStatus");
+        statusEl.innerHTML = `<span style="color:blue">Starting ingestion...</span>`;
 
         try {
-            const res = await fetch("/ingest", { method: "POST" });
-            if (!res.ok) throw new Error();
+            // Start ingestion
+            const res = await fetch("/ingest", {method: "POST"});
+            const data = await res.json();
+            const jobId = data.jobId;
 
-            const txt = await res.text();
-            status.innerHTML = `<span style="color:green">${txt}</span>`;
+            statusEl.innerHTML = `<span style="color:blue">
+      Ingestion started (job ${jobId}). Checking status...
+    </span>`;
+
+            console.log("Polling start, job:", jobId);
+
+            // Define polling function INSIDE runIngestion
+            async function poll() {
+                console.log("Polling...");
+
+                const sres = await fetch(`/ingest_status?jobId=${jobId}`);
+                const sdata = await sres.json();
+
+                console.log("Status:", sdata.status);
+
+                const st = sdata.status;
+
+                if (st === "STARTING" || st === "STARTED" || st === "IN_PROGRESS") {
+                    statusEl.innerHTML = `<span style="color:blue">In progress...</span>`;
+                    setTimeout(poll, 2000); // SCHEDULE NEXT POLL
+                    return;
+                }
+
+                if (st === "COMPLETED" || st === "COMPLETE") {
+                    statusEl.innerHTML = `<span style="color:green">KB updated successfully</span>`;
+                    return;
+                }
+
+                // error case
+                statusEl.innerHTML = `<span style="color:red">Ingestion failed: ${st}</span>`;
+            }
+
+            // Start polling
+            await poll();
 
         } catch (err) {
-            status.innerHTML = `<span style="color:red">Ingestion failed</span>`;
+            statusEl.innerHTML = `<span style="color:red">Error starting ingestion</span>`;
+            console.error(err);
         }
     }
 
+
     loadFolders();
+
+
 </script>
 
 {% endblock %}

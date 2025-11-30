@@ -1,23 +1,80 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8" />
-  <title>{% block title %}RAG System{% endblock %}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <meta charset="UTF-8">
+    <title>My Car Diagnostic Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 
 <body>
-<header class="header">
-  <h1>RAG Knowledge Base</h1>
-</header>
 
-<main class="container">
-  {% block content %}{% endblock %}
-</main>
+<!-- HEADER -->
+<div class="main-header">
+    My Car Diagnostic Dashboard
+</div>
 
-<footer class="footer">
-  <small>Powered by AWS Bedrock</small>
-</footer>
+<!-- LEFT GAUGE -->
+<div class="gauge-left">
+    <svg viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="90" stroke="#ff9800" stroke-width="4" fill="none"/>
+
+        <g stroke="#666" stroke-width="3">
+            <line x1="100" y1="15" x2="100" y2="30"/>
+            <line x1="160" y1="40" x2="150" y2="55"/>
+            <line x1="185" y1="100" x2="170" y2="100"/>
+            <line x1="160" y1="160" x2="150" y2="145"/>
+            <line x1="100" y1="185" x2="100" y2="170"/>
+            <line x1="40" y1="160" x2="55" y2="145"/>
+            <line x1="15" y1="100" x2="30" y2="100"/>
+            <line x1="40" y1="40" x2="55" y2="55"/>
+        </g>
+
+        <!-- Static needle -->
+        <line id="needleLeft" x1="100" y1="100" x2="150" y2="100"
+              stroke="#00eaff" stroke-width="4"/>
+    </svg>
+</div>
+
+<!-- RIGHT GAUGE -->
+<div class="gauge-right">
+    <svg viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="90" stroke="#ff9800" stroke-width="4" fill="none"/>
+
+        <g stroke="#666" stroke-width="3">
+            <line x1="100" y1="15" x2="100" y2="30"/>
+            <line x1="160" y1="40" x2="150" y2="55"/>
+            <line x1="185" y1="100" x2="170" y2="100"/>
+            <line x1="160" y1="160" x2="150" y2="145"/>
+            <line x1="100" y1="185" x2="100" y2="170"/>
+            <line x1="40" y1="160" x2="55" y2="145"/>
+            <line x1="15" y1="100" x2="30" y2="100"/>
+            <line x1="40" y1="40" x2="55" y2="55"/>
+        </g>
+
+        <line id="needleRight" x1="100" y1="100" x2="50" y2="100"
+              stroke="#00eaff" stroke-width="4"/>
+    </svg>
+</div>
+
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+
+<script>
+    /* --- Light animation: slow needle oscillation --- */
+    /* לא כבד – רק תנועה נעימה */
+    let angle = 0;
+    setInterval(() => {
+        angle = (angle + 1.2) % 30;  /* oscillation 0–30 degrees */
+
+        const left = document.getElementById("needleLeft");
+        const right = document.getElementById("needleRight");
+
+        if (left) left.setAttribute("transform", `rotate(${angle} 100 100)`);
+        if (right) right.setAttribute("transform", `rotate(${-angle} 100 100)`);
+
+    }, 120);
+</script>
+
 </body>
 </html>
